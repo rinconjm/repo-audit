@@ -1,4 +1,5 @@
 from urllib.parse import urlparse
+from typing import Any, Dict, List, Optional, Set, Tuple, Union
 
 import requests
 
@@ -9,7 +10,7 @@ class GitHubAPIError(Exception):
     def __init__(
         self,
         message: str,
-        status_code: int | None = None,
+        status_code: Optional[int] = None,
         rate_limited: bool = False,
     ):
         super().__init__(message)
@@ -17,7 +18,7 @@ class GitHubAPIError(Exception):
         self.rate_limited = rate_limited
 
 
-def parse_github_url(url: str) -> tuple[str, str]:
+def parse_github_url(url: str) -> Tuple[str, str]:
     """Return owner and repo from a GitHub HTTPS URL."""
     parsed = urlparse(url)
     if parsed.scheme != "https" or parsed.netloc != "github.com":
@@ -37,7 +38,7 @@ def parse_github_url(url: str) -> tuple[str, str]:
     return owner, repo
 
 
-def github_get(path: str) -> dict | list:
+def github_get(path: str) -> Union[Dict[str, Any], List[Dict[str, Any]]]:
     """Make an unauthenticated GitHub API GET request."""
     try:
         response = requests.get(f"{GITHUB_API_BASE_URL}{path}", timeout=10)
@@ -67,7 +68,7 @@ def github_get(path: str) -> dict | list:
     )
 
 
-def get_repo_metadata(owner: str, repo: str) -> dict:
+def get_repo_metadata(owner: str, repo: str) -> Dict[str, Any]:
     """Return repository metadata from the GitHub API."""
     data = github_get(f"/repos/{owner}/{repo}")
     if not isinstance(data, dict):
@@ -75,7 +76,7 @@ def get_repo_metadata(owner: str, repo: str) -> dict:
     return data
 
 
-def get_root_files(owner: str, repo: str) -> set[str]:
+def get_root_files(owner: str, repo: str) -> Set[str]:
     """Return root file and folder names for a repository."""
     data = github_get(f"/repos/{owner}/{repo}/contents")
     if not isinstance(data, list):
