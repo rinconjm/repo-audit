@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from enum import Enum
+from typing import Any, Dict, List, Set
 
 from repo_ready.github import (
     GitHubAPIError,
@@ -33,7 +34,7 @@ class AuditSummary:
 
 
 def calculate_summary(
-    results: list[CheckResult], strict: bool = False
+    results: List[CheckResult], strict: bool = False
 ) -> AuditSummary:
     """Calculate score and status totals for an audit report."""
     passed = sum(result.status == CheckStatus.PASS for result in results)
@@ -84,7 +85,7 @@ def check_repo_exists(url: str) -> CheckResult:
         )
 
 
-def check_repo_public(metadata: dict) -> CheckResult:
+def check_repo_public(metadata: Dict[str, Any]) -> CheckResult:
     """Check whether repository metadata describes a public repository."""
     if metadata.get("private"):
         return CheckResult(
@@ -100,7 +101,7 @@ def check_repo_public(metadata: dict) -> CheckResult:
     )
 
 
-def check_readme_exists(root_files: set[str]) -> CheckResult:
+def check_readme_exists(root_files: Set[str]) -> CheckResult:
     """Check whether the root contains a recognized README file."""
     candidates = ("README.md", "README.rst", "README.txt", "README")
     for candidate in candidates:
@@ -118,7 +119,7 @@ def check_readme_exists(root_files: set[str]) -> CheckResult:
     )
 
 
-def check_required_file(root_files: set[str], filename: str) -> CheckResult:
+def check_required_file(root_files: Set[str], filename: str) -> CheckResult:
     """Check whether a required root file exists."""
     if filename in root_files:
         return CheckResult(
@@ -166,7 +167,7 @@ def check_multiple_commits(owner: str, repo: str) -> CheckResult:
     )
 
 
-def audit_repository(url: str, strict: bool = False) -> list[CheckResult]:
+def audit_repository(url: str, strict: bool = False) -> List[CheckResult]:
     """Run all RepoReady checks and return result rows."""
     del strict
     try:
